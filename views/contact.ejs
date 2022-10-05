@@ -9,7 +9,7 @@
 <body>
     <%- include('partials/header'); -%>
     <h1>Contact Us</h1>
-    <p><%= content %></p>
+    <p><%- content.replaceAll('\n', '<br>') %></p>
     <%- include('partials/footer'); -%>
 </body>
 </html>
