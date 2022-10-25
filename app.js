@@ -47,17 +47,24 @@ const contactContent = "Email id : vikaskaly@gmail.com \n Phone number : 8762175
 
 
 app.get("/",function(req,res){
-    Post_Model.find({},function(err,foundList){
-        if(err){
-            console.log(err);
-        }else{
-            if(foundList){
-                res.render("home",{"content":homeStartingContent,"posts":foundList});
-            }else{
-                res.render("home",{"content":homeStartingContent,"posts":[]});
-            }
-        }
-    });
+    // Post_Model.find({},function(err,foundList){
+    //     if(err){
+    //         console.log(err);
+    //     }else{
+    //         if(foundList){
+    //             res.render("home",{"content":homeStartingContent,"posts":foundList});
+    //         }else{
+    //             res.render("home",{"content":homeStartingContent,"posts":[]});
+    //         }
+    //     }
+    // });
+    if(req.isAuthenticated()){
+        //Find the blog posts
+        res.render("home",{"content":homeStartingContent,"posts":[],"authenticated":true});
+    }else{
+        const homeStartingContent2=homeStartingContent+"\n <br><br><br><br><h3> <center> Sign-up to start using the App";
+        res.render("home",{"content":homeStartingContent2,"posts":[],"authenticated":false});
+    }
 });
 
 app.get("/about",function(req,res){
@@ -68,16 +75,36 @@ app.get("/contact",function(req,res){
 });
 
 app.get("/compose",function(req,res){
-    res.render("compose");
+    if(req.isAuthenticated()){
+        res.render("compose");
+    }else{
+        res.redirect("/login");
+    }
+    
 });
+
 app.get("/signup",function(req,res){
     res.render("signup");
-})
+});
+
 app.get("/login",function(req,res){
     res.render("login");
-})
+});
+
+app.get("/logout",function(req,res){
+    req.logout(function(err){
+        if(err){ 
+            return next(err); 
+        }
+        res.redirect('/');
+    });
+});
+
 app.get("/posts/:postName",function(req,res){
     const this_id=req.params.postName;
+    User_model.findOne({_id:req.user.id},function(err,res){
+
+    });
     Post_Model.findOne({_id : this_id},function(err,result){
         if(!err){
             res.render('post',{thePost : result})
@@ -124,7 +151,21 @@ app.post("/signup",(req,res)=>{
         }
     });
 });
-
+app.post("/login",function(req,res){
+    const user = new User_model({
+        username:req.body.username,
+        password:req.body.password
+    });
+    req.login(user,function(err){
+        if(err){
+            console.log(err);
+        }else{
+            passport.authenticate("local")(req,res,function(){
+                res.redirect("/");
+            });
+        }
+    });
+});
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });
