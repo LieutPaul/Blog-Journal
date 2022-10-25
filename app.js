@@ -1,6 +1,5 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const ejs = require("ejs");
 const mongoose=require('mongoose');
 
 const app = express();
@@ -8,6 +7,12 @@ mongoose.connect("mongodb://localhost:27017/blogDB",{useNewURLParser:true});
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
+
+const UserSchema = new mongoose.Schema({
+    username : String,
+    password : String,
+    posts: Array
+});
 
 const postSchema = new mongoose.Schema({
     title : String,
@@ -45,7 +50,12 @@ app.get("/contact",function(req,res){
 app.get("/compose",function(req,res){
     res.render("compose");
 });
-
+app.get("/signup",function(req,res){
+    res.render("signup");
+})
+app.get("/login",function(req,res){
+    res.render("login");
+})
 app.get("/posts/:postName",function(req,res){
     const this_id=req.params.postName;
     Post_Model.findOne({_id : this_id},function(err,result){
@@ -54,6 +64,7 @@ app.get("/posts/:postName",function(req,res){
         }
     })
 });
+
 
 app.post("/compose",function(req,res){
     const post=new Post_Model({
@@ -69,6 +80,7 @@ app.post("/compose",function(req,res){
     });
     res.redirect("/");
 });
+
 app.post("/delete",function(req,res){
     const id_to_be_deleted= req.body.deleteButton;
     Post_Model.deleteOne({_id:id_to_be_deleted},function(err){
@@ -78,6 +90,7 @@ app.post("/delete",function(req,res){
     });
     res.redirect("/");
 });
+
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });
