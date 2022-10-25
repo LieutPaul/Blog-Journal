@@ -1,24 +1,44 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose=require('mongoose');
+const session = require('express-session')
+const passport=require("passport");
+const passportLocalMongoose=require("passport-local-mongoose");
 
 const app = express();
-mongoose.connect("mongodb://localhost:27017/blogDB",{useNewURLParser:true});
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
+app.use(session({
+    secret : "Our little secret.", 
+    resave : false,
+    saveUninitialized : false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+mongoose.connect("mongodb://localhost:27017/blogDB",{useNewURLParser:true});
+
+
 const UserSchema = new mongoose.Schema({
     username : String,
-    password : String,
-    posts: Array
+    password : String
+    //posts: Array
 });
-
 const postSchema = new mongoose.Schema({
     title : String,
     post : String
 });
-const Post_Model = mongoose.model("Post",postSchema);
+
+UserSchema.plugin(passportLocalMongoose);
+
+const Post_Model = new mongoose.model("Post",postSchema);
+const User_model = new mongoose.model("User",UserSchema);
+
+passport.use(User_model.createStrategy());
+passport.serializeUser(User_model.serializeUser());
+passport.deserializeUser(User_model.deserializeUser());
 
 const homeStartingContent = "Welcome to your own Journal Page. \n Make a new entry by pressing the 'New Post' button. \n Delete the post by clicking 'Read More' on the post and clicking the 'Delete Post' button in the post page.";
 const aboutContent = "The website frontend is written using EJS, CSS.\n The backend uses NodeJS(Express) and MongoDB(Mongoose) for storing the Posts.";
@@ -89,6 +109,20 @@ app.post("/delete",function(req,res){
         }
     });
     res.redirect("/");
+});
+
+app.post("/signup",(req,res)=>{
+    User_model.register({"username":req.body.username},req.body.password,function(err,user){
+        if(err){
+            console.log(err);
+            res.redirect("/");
+        }else{
+            passport.authenticate("local")(req,res,function(){
+                console.log("User Added successfully");
+                res.redirect("/");
+            });
+        }
+    });
 });
 
 app.listen(3000, function() {
