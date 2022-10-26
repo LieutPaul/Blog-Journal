@@ -8,7 +8,7 @@
 </head>
 <body style="overflow : scroll;">
     <% if(authenticated===true){ %>
-    <%- include('partials/header2'); -%>
+    <%- include('partials/header2',{title :`${name}`}); -%>
     <% }else{ %>
     <%- include('partials/header'); -%>
     <% }%>
