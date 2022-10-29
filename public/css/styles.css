@@ -40,3 +40,11 @@
 .invalid{
     color : red;
 }
+
+.deletediv{
+    position:absolute;
+}
+.editdiv{
+    margin : 0 0 0 7.5%;
+    position:absolute;
+}

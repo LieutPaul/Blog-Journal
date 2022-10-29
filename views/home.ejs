@@ -8,9 +8,9 @@
 </head>
 <body style="overflow : scroll;">
     <% if(authenticated===true){ %>
-    <%- include('partials/header2',{title :`${name}`}); -%>
+        <%- include('partials/header2',{title :`${name}`}); -%>
     <% }else{ %>
-    <%- include('partials/header'); -%>
+        <%- include('partials/header'); -%>
     <% }%>
     <h1>Home</h1>
     <p><%- content.replaceAll('\n', '<br>') %></p>

@@ -71,15 +71,23 @@ app.get("/",function(req,res){
 });
 
 app.get("/about",function(req,res){
-    res.render("about",{"content":aboutContent});
+    if(req.isAuthenticated()){
+        res.render("about",{"content":aboutContent,"name":req.user.name,"authenticated":true});
+    }else{
+        res.render("about",{"content":aboutContent,"authenticated":false});
+    }
 });
 app.get("/contact",function(req,res){
-    res.render("contact",{"content":contactContent});
+    if(req.isAuthenticated()){
+        res.render("contact",{"content":contactContent,"name":req.user.name,"authenticated":true});
+    }else{
+        res.render("contact",{"content":contactContent,"authenticated":false});
+    }
 });
 
 app.get("/compose",function(req,res){
     if(req.isAuthenticated()){
-        res.render("compose");
+        res.render("compose",{name:req.user.name});
     }else{
         res.redirect("/login");
     }
@@ -111,21 +119,40 @@ app.get("/logout",function(req,res){
 });
 
 app.get("/posts/:postName",function(req,res){
-    const post_id=req.params.postName;
-    User_model.findOne({username : req.user.username},(err,foundUser)=>{
-        if(err){
-            console.log(err);
-        }else{
-            if(foundUser){
-                const post=foundUser.posts.id(post_id);
-                res.render('post',{thePost : post, "name":req.user.name});
+    if(req.isAuthenticated()){
+        const post_id=req.params.postName;
+        User_model.findOne({username : req.user.username},(err,foundUser)=>{
+            if(err){
+                console.log(err);
+            }else{
+                if(foundUser){
+                    const post=foundUser.posts.id(post_id);
+                    res.render('post',{thePost : post, "name":req.user.name});
+                }
             }
-        }
-    });
-    
+        });
+    }else{
+        res.redirect("/");
+    }
 });
 
-
+app.post("/editpage",(req,res)=>{
+    if(req.isAuthenticated()){
+        const post_id = req.body.editButton;
+        User_model.findOne({username : req.user.username},(err,foundUser)=>{
+            if(err){
+                console.log(err);
+            }else{
+                if(foundUser){
+                    const post=foundUser.posts.id(post_id);
+                    res.render("editpage",{title:post.title,content:post.post,name:req.user.name});
+                }
+            }
+        });
+    }else{
+        res.redirect("/login");
+    }
+});
 
 
 app.post("/compose",function(req,res){
@@ -147,22 +174,28 @@ app.post("/compose",function(req,res){
 });
 
 app.post("/delete",function(req,res){
-    const post_id = req.body.deleteButton;
-    User_model.findOne({username : req.user.username},(err,foundUser)=>{
-        if(err){
-            console.log(err);
-        }else{
-            if(foundUser){
-                foundUser.posts.id(post_id).remove();
-                foundUser.save((err)=>{
-                    console.log(err);
-                });
-                res.redirect("/");
+    if(req.isAuthenticated()){
+        const post_id = req.body.deleteButton;
+        User_model.findOne({username : req.user.username},(err,foundUser)=>{
+            if(err){
+                console.log(err);
+            }else{
+                if(foundUser){
+                    foundUser.posts.id(post_id).remove();
+                    foundUser.save((err)=>{
+                        console.log(err);
+                    });
+                    res.redirect("/");
+                }
             }
-        }
-    });
+        });
+    }else{
+        res.redirect("/");
+    }
+
     
 });
+
 
 app.post("/signup",(req,res)=>{
     User_model.register({"username":req.body.username,"name":req.body.name},req.body.password,function(err,user){
@@ -194,7 +227,11 @@ app.post("/login",function(req,res){
     });
 });
 
-
+app.post("/edit",(req,res)=>{
+    console.log(req.body.title);
+    console.log(req.body.post);
+    res.redirect("/");
+});
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });

@@ -7,7 +7,11 @@
     <title>Contact</title>
 </head>
 <body>
-    <%- include('partials/header'); -%>
+    <% if(authenticated===true){ %>
+        <%- include('partials/header2',{title :`${name}`}); -%>
+    <% }else{ %>
+        <%- include('partials/header'); -%>
+    <% }%>
     <h1>Contact Us</h1>
     <p><%- content.replaceAll('\n', '<br>') %></p>
     <%- include('partials/footer'); -%>

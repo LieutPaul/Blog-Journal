@@ -12,10 +12,19 @@
     <p>
         <%=thePost.post%>
     </p>
-    <form action="/delete" method="POST">
-        <input class="btn btn-primary" type="submit" value="Delete Post">
-        <input type="hidden" name = "deleteButton" value="<%= thePost._id %>">
-    </form>
+        <div class="deletediv">
+            <form action="/delete" method="POST">
+                <input class="btn btn-primary" type="submit" value="Delete Post">
+                <input type="hidden" name = "deleteButton" value="<%= thePost._id %>">
+            </form>
+        </div>
+        <div class="editdiv">
+            <form action="/editpage" method="POST">
+                <input class="btn btn-primary" type="submit" value="Edit Post">
+                <input type="hidden" name = "editButton" value="<%= thePost._id %>">
+            </form>
+        </div>
+
     <%- include('partials/footer'); -%>
 </body>
 </html>
