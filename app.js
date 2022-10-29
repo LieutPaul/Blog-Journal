@@ -5,6 +5,13 @@ const session = require('express-session')
 const passport=require("passport");
 const passportLocalMongoose=require("passport-local-mongoose");
 
+var jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+var $ = require("jquery")(window);
+
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
@@ -80,13 +87,20 @@ app.get("/compose",function(req,res){
 });
 
 app.get("/signup",function(req,res){
-    res.render("signup");
+    res.render("signup",{userExists:false});
+});
+
+app.get("/signuperror",function(req,res){
+    res.render("signup",{userExists:true});
 });
 
 app.get("/login",function(req,res){
-    res.render("login");
+    res.render("login",{invalidUser:false});
 });
 
+app.get("/loginerror",function(req,res){
+    res.render("login",{invalidUser:true});
+});
 app.get("/logout",function(req,res){
     req.logout(function(err){
         if(err){ 
@@ -154,9 +168,9 @@ app.post("/signup",(req,res)=>{
     User_model.register({"username":req.body.username,"name":req.body.name},req.body.password,function(err,user){
         if(err){
             console.log(err);
-            res.redirect("/");
+            res.redirect("/signuperror");
         }else{
-            passport.authenticate("local")(req,res,function(){
+            passport.authenticate("local",{failureRedirect:'/signuperror',failureMessage: true })(req,res,function(){
                 console.log("User Added successfully");
                 res.redirect("/");
             });
@@ -166,19 +180,20 @@ app.post("/signup",(req,res)=>{
 
 app.post("/login",function(req,res){
     const user = new User_model({
-        username:req.body.username,
-        password:req.body.password
+        username : req.body.username,
+        password : req.body.password
     });
     req.login(user,function(err){
         if(err){
             console.log(err);
         }else{
-            passport.authenticate("local")(req,res,function(){
+            passport.authenticate("local",{failureRedirect:'/loginerror',failureMessage: true })(req,res,function(){
                 res.redirect("/");
             });
         }
     });
 });
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");

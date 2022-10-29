@@ -33,3 +33,10 @@
 	font-size: 12px;
   color: #fff;
 }
+
+.not_invalid{
+    color : transparent;
+}
+.invalid{
+    color : red;
+}

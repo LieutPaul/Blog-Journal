@@ -1,5 +1,5 @@
 <%- include('partials/header') %>
-
+<script src="ejs.min.js"></script>
 <div class="container mt-5">
   <h1>Login</h1>
 
@@ -20,23 +20,30 @@
             </div>
             <button type="submit" class="btn btn-dark">Login</button>
           </form>
+          
+          <div id="invalid">
+            <p>Invalid Login Credentials.</p>
+          </div>
+          
 
         </div>
       </div>
     </div>
 
-    <!-- <div class="col-sm-4">
-      <div class="card">
-        <div class="card-body">
-          <a class="btn btn-block" href="/auth/google" role="button">
-            <i class="fab fa-google"></i>
-            Sign In with Google
-          </a>
-        </div>
-      </div>
-    </div> -->
+
+    <% if(invalidUser===true){ %>
+      <script>
+        var element = document.getElementById("invalid");
+        element.classList.add("invalid");
+      </script>
+    <% }else{ %>
+      <script>
+        var element = document.getElementById("invalid");
+        element.classList.add("not_invalid");
+      </script>
+    <% } %>
+
 
   </div>
 </div>
-
 <%- include('partials/footer') %>

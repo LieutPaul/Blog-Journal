@@ -1,4 +1,5 @@
 <%- include('partials/header') %>
+<script src="ejs.min.js"></script>
 <div class="container mt-5">
   <h1>Register</h1>
 
@@ -27,15 +28,27 @@
             <p>
                 <br>Already Have an Account? Then login <a href="/login">here</a>.
             </p>
+            <div id="invalid">
+              <p><br>User already exists.</p>
+            </div>
 
 
         </div>
       </div>
     </div>
-
-    
-
   </div>
 </div>
+
+<%if(userExists===true){%>
+  <script>
+    var element = document.getElementById("invalid");
+    element.classList.add("invalid");
+  </script>
+<%}else{%>
+  <script>
+    var element = document.getElementById("invalid");
+    element.classList.add("not_invalid");
+  </script>
+<%}%>
 
 <%- include('partials/footer') %>
