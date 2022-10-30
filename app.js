@@ -109,13 +109,19 @@ app.get("/login",function(req,res){
 app.get("/loginerror",function(req,res){
     res.render("login",{invalidUser:true});
 });
+
 app.get("/logout",function(req,res){
-    req.logout(function(err){
-        if(err){ 
-            return next(err); 
-        }
-        res.redirect('/');
-    });
+    if(req.isAuthenticated()){
+        req.logout(function(err){
+            if(err){ 
+                return next(err); 
+            }
+            res.redirect('/');
+        });
+    }else{
+        res.redirect("/");
+    }
+
 });
 
 app.get("/posts/:postName",function(req,res){
@@ -145,7 +151,7 @@ app.post("/editpage",(req,res)=>{
             }else{
                 if(foundUser){
                     const post=foundUser.posts.id(post_id);
-                    res.render("editpage",{title:post.title,content:post.post,name:req.user.name});
+                    res.render("editpage",{title:post.title,content:post.post,name:req.user.name,id:post_id});
                 }
             }
         });
@@ -227,11 +233,25 @@ app.post("/login",function(req,res){
     });
 });
 
-app.post("/edit",(req,res)=>{
-    console.log(req.body.title);
-    console.log(req.body.post);
-    res.redirect("/");
+app.post("/edit/:postId",(req,res)=>{ 
+    const post_id=req.params.postId;
+    console.log(post_id);
+    User_model.findOne({username : req.user.username},(err,foundUser)=>{
+        if(err){
+            console.log(err);
+            res.redirect("/");
+        }else{
+            if(foundUser){
+                const currpost=foundUser.posts.id(post_id);
+                currpost.title=req.body.title;
+                currpost.post=req.body.post;
+                foundUser.save();
+                res.redirect("/");
+            }
+        }
+    });
 });
+
 app.listen(3000, function() {
   console.log("Server started on port 3000");
 });

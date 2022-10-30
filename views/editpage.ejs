@@ -9,7 +9,7 @@
 <body>
     <%- include('partials/header2',{title :`${name}`}); -%>
     <h1>Compose</h1>
-    <form action="/edit" method="post">
+    <form action=<%="/edit/" + id %> method="post">
 
         <div class="form-group">
             <label for="exampleFormControlInput1">Title</label>
@@ -19,7 +19,7 @@
         <div class="form-group">
             <label for="exampleFormControlTextarea1">Post</label>
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" name="post">
-                <%=content%>
+<%=content%>
             </textarea>
         </div>
 

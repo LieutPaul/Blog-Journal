@@ -42,9 +42,10 @@
 }
 
 .deletediv{
+    margin : 0 0 0 30%;
     position:absolute;
 }
 .editdiv{
-    margin : 0 0 0 7.5%;
+    margin : 0 0 0 40%;
     position:absolute;
 }
